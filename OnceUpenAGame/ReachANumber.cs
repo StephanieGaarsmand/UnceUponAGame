@@ -9,9 +9,9 @@ namespace OnceUpenAGame
     public class ReachANumber
     {
         public int TargetValue;
-        public int CurrentValue = 0;
+        public int CurrentValue = 1;
         public List<Operator> Operators = new List<Operator>();
-        public int Round=0;
+        public int Round = 0;
         public int RoundLimit = 7;
         private Random random = new Random();
 
@@ -24,10 +24,8 @@ namespace OnceUpenAGame
             }
         }
 
-
         public void CalculateCurrentValue(int selectedNumber)
         {
-
             switch (Operators[Round])
             {
                 case Operator.add:
@@ -48,9 +46,6 @@ namespace OnceUpenAGame
 
             }
             Round++;
-            Console.WriteLine(CurrentValue);
-
-
 
             // Udregn nuævrende værdi udfra det valgte nummer og tilfældig operator
             // Tjek om nummeret er ramt samt om runder er brugt
@@ -58,10 +53,39 @@ namespace OnceUpenAGame
 
         public void SelectNumber()
         {
-            random.Next(0, 51);
-            CalculateCurrentValue(0); // Vis muligheder til brugeren. Modtag input fra bruger.
-                                      // Vi kører metoden med det valgte input
+            while (Round + 1 <= RoundLimit)
+            {
+                Console.Clear();
+                for (int i = 0; i < Operators.Count; i++)
+                {
+                    if (i == Operators.Count - 1)
+                    {
+                        Console.Write($"{Operators[i]}\n\n");
+                    }
+                    else
+                        Console.Write($"{Operators[i]}, ");
+                }
+                List<int> numbers = new();
+                for (int i = 0; i < 3; i++)
+                {
+                    numbers.Add(random.Next(0, 51));
+                }
 
+                Console.WriteLine($"The number you're trying to reach is: {TargetValue}");
+                Console.WriteLine($"The number you have: {CurrentValue} \n");
+
+                Console.WriteLine("You can choose between the following numbers:");
+                Console.WriteLine($"1) {numbers[0]}");
+                Console.WriteLine($"2) {numbers[1]}");
+                Console.WriteLine($"3) {numbers[2]}\n");
+
+                Console.Write("You choose: ");
+                _ = int.TryParse(Console.ReadLine(), out int chosen);
+
+                CalculateCurrentValue(numbers[chosen -1]);
+            }
+            // Vis muligheder til brugeren. Modtag input fra bruger.
+            // Vi kører metoden med det valgte input
         }
     }
 }
