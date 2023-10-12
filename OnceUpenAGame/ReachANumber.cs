@@ -23,7 +23,7 @@ namespace OnceUpenAGame
             TargetValue = random.Next(10, 51);
             for (int i = 0; i < RoundLimit; i++)
             {
-                if(i == 0)
+                if (i == 0)
                     Operators.Add(Operator.add);
                 else
                     Operators.Add((Operator)random.Next(0, 2)); // Vi tager vores operator og tilfældiggøre den mellem 0-3
@@ -43,20 +43,18 @@ namespace OnceUpenAGame
                     newValue -= selectedNumber;
                     break;
 
-                //case Operator.multiply:
-                //    newValue *= selectedNumber;
-                //    break;
+                    //case Operator.multiply:
+                    //    newValue *= selectedNumber;
+                    //    break;
 
-                //case Operator.divide:
-                //    newValue = (int)Math.Round((double)newValue / selectedNumber);
-                //    if (newValue == 0)
-                //        newValue = 1;
-                //    break;
+                    //case Operator.divide:
+                    //    newValue = (int)Math.Round((double)newValue / selectedNumber);
+                    //    if (newValue == 0)
+                    //        newValue = 1;
+                    //    break;
 
             }
             return newValue;
-            // Udregn nuævrende værdi udfra det valgte nummer og tilfældig operator
-            // Tjek om nummeret er ramt samt om runder er brugt
         }
 
         private void WriteOptions(List<int> numbers, int index)
@@ -64,12 +62,22 @@ namespace OnceUpenAGame
             Console.Clear();
             for (int i = 0; i < Operators.Count; i++)
             {
+                if (i < Round)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                }
+                else if (i == Round)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                }
+
                 if (i == Operators.Count - 1)
                 {
                     Console.Write($"{Operators[i]}\n\n");
                 }
                 else
                     Console.Write($"{Operators[i]}, ");
+                Console.ForegroundColor = ConsoleColor.White;
             }
             Console.ForegroundColor = ConsoleColor.Yellow; Console.WriteLine($"The number you're trying to reach is: {TargetValue}");
             Console.WriteLine($"The number you have: {CurrentValue} \n");
@@ -91,6 +99,8 @@ namespace OnceUpenAGame
                 }
 
                 Console.Write(number);
+                if (number < 10)
+                    Console.Write(' ');
 
                 if (numbers.IndexOf(number) == index)
                 {
@@ -111,12 +121,12 @@ namespace OnceUpenAGame
             {
                 if (CurrentValue == TargetValue)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine(FiggleFonts.Epic.Render("You've  Won!"));
                     Console.ForegroundColor = ConsoleColor.White;
                     break;
                 }
-                
+
                 List<int> numbers = new();
                 for (int i = 0; i < 3; i++)
                 {
@@ -184,9 +194,13 @@ namespace OnceUpenAGame
 
                 Round++;
             }
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(FiggleFonts.Epic.Render("You've  lost!"));
-            Console.ForegroundColor = ConsoleColor.White;
+            if (CurrentValue != TargetValue)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(FiggleFonts.Epic.Render("You've  lost!"));
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+
         }
     }
 }
