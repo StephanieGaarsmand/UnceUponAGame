@@ -1,4 +1,5 @@
 ﻿using Figgle;
+using System;
 using System.Collections.Generic;
 
 namespace OnceUpenAGame
@@ -90,7 +91,7 @@ namespace OnceUpenAGame
 
         private void WriteOptions(List<int> numbers, int index)
         {
-            Console.Clear();
+            Console.SetCursorPosition(0, 0);
             for (int i = 0; i < Operators.Count; i++)
             {
                 if (i < Round)
@@ -148,6 +149,7 @@ namespace OnceUpenAGame
 
         public void SelectNumber()
         {
+            Console.Clear();
             while (Round + 1 <= RoundLimit)
             {
                 if (CurrentValue == TargetValue)
@@ -155,7 +157,9 @@ namespace OnceUpenAGame
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine(FiggleFonts.Epic.Render("You've  Won!"));
                     Console.ForegroundColor = ConsoleColor.White;
-                    break;
+                    Thread.Sleep(1000);
+                    Console.ReadKey();
+                    Program.BedroomBad.DisplayScene();
                 }
 
                 List<int> numbers = AllNumbers[Round];
@@ -219,10 +223,10 @@ namespace OnceUpenAGame
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(FiggleFonts.Epic.Render("You've  lost!"));
                 Console.ForegroundColor = ConsoleColor.White;
+                Thread.Sleep(1000);
+                Console.ReadKey();
+                Program.BedroomBad.DisplayScene();
             }
-
-            Thread.Sleep(5000);
-            return;
         }
     }
 }

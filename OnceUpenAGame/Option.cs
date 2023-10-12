@@ -8,7 +8,7 @@ namespace OnceUpenAGame
 {
     public class Option
     {
-        public string Name { get; }
+        public string Name { get; set; }
         public Action Selected { get; }
 
         public Option(string name, Action selected)
