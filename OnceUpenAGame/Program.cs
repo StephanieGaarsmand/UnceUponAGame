@@ -1,11 +1,24 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace OnceUpenAGame
 {
     public class Program
     {
+        #region Used to maximise Window
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        private static extern IntPtr GetConsoleWindow();
+        private static IntPtr ThisConsole = GetConsoleWindow();
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        #endregion
         static void Main(string[] args)
         {
+            #region Used to maximise Window
+            Console.SetWindowSize(Console.LargestWindowWidth, Console.LargestWindowHeight);
+            ShowWindow(ThisConsole, 3);
+            #endregion
+
             Player player = new Player();
             Item goldCoin = new Item();
             ReachANumber reachANumber = new ReachANumber();
@@ -39,7 +52,7 @@ namespace OnceUpenAGame
                 new List<Option>() { new Option("Pick it up", ()=> goldCoin.PickUpItem()) });
             Scene church2 = new("Church",
                 "Continuing to look around you spot another doorway",
-                new List<Scene>(),
+                new List<Scene>() { reachANumberGame },
                 new List<Option>() { openInventory });
             Scene church = new("Church",
                 "Standing in the middle of the pews looking towards the alter, you see one of your family photos... Weird..\nIgnoring it you see something shiny on one of the pews.",
@@ -69,8 +82,13 @@ namespace OnceUpenAGame
                 new List<Option>() { openInventory});
 
             Scene prolgue = new("Prologue",
-                "You're standing outside a dark ominous looking cave, with small (adorable?) spiders crawling near the entrance.",
-                new List<Scene>() {reachANumberGame, cave},
+                "You suddenly find yourself standing outside a dark ominous looking cave, with small (adorable?) spiders crawling near the entrance.\n" +
+                "You spot a note:\n\n\n" +
+                "Adventurer,\n" +
+                "I the GREATEST wizard of all, have your parents hidden away in my cave.\n" +
+                "To find them, you must find a KEY... but where?\n\n" +
+                "Good luck...",
+                new List<Scene>() {cave},
                 new List<Option>() { new ("Leave the cave alone", () => Environment.Exit(0)) });
 
             prolgue.DisplayScene();
