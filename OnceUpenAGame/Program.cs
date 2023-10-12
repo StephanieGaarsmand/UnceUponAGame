@@ -15,6 +15,15 @@ namespace OnceUpenAGame
                 () => player.OpenInventory()
                 );
 
+            Scene reachANumberGame = new("Rules - Reach  a  number",
+                "The Great Wizard has captured your parents and the only way to free them is by completing his DIE HARD CHALLENGE.\n" +
+                "This challenge needs to be completed within 7 tries, BUT not all tries needs to be used, for the freedom of your parents.\n" +
+                "To win the game you have to add, subtract and use the witts of Mathematics, The Great Wizards only accepts intellectual beings, no mere human can complete this.\n\n" +
+                "Now you have to chose from a list of numbers, filled with new numbers each round, to use with the given operators.\n" +
+                "The operators is already planed for you. - read the game design CAREFULLY",
+                new List<Scene>(),
+                new List<Option>() { new("Start game", () => reachANumber.SelectNumber()) });
+
             #region Great Hall
             Scene greatHall = new("The Hall Of Greatness",
                 "Description here",
@@ -61,22 +70,11 @@ namespace OnceUpenAGame
 
             Scene prolgue = new("Prologue",
                 "You're standing outside a dark ominous looking cave, with small (adorable?) spiders crawling near the entrance.",
-                new List<Scene>() {cave},
-                new List<Option>() { new("Reach a Number", () => reachANumber.SelectNumber()), new ("Leave the cave alone", () => Environment.Exit(0)) });
-
-            
-
-
-            
-            /*reachANumber.CalculateCurrentValue(10);
-            reachANumber.CalculateCurrentValue(2);
-            reachANumber.CalculateCurrentValue(5);*/
+                new List<Scene>() {reachANumberGame, cave},
+                new List<Option>() { new ("Leave the cave alone", () => Environment.Exit(0)) });
 
             prolgue.DisplayScene();
 
-
-            reachANumber.SelectNumber();
-            //reachANumber.Operators.ForEach(Console.WriteLine);
             Console.ReadLine();
         }
     }

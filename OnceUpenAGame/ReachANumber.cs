@@ -1,39 +1,70 @@
 ﻿using Figgle;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace OnceUpenAGame
 {
     public class ReachANumber
     {
-        public int TargetValue;
+        public int TargetValue = 0;
         public int CurrentValue = 1;
         public List<Operator> Operators = new List<Operator>();
+        List<List<int>> AllNumbers = new();
         public int Round = 0;
         public int RoundLimit = 7;
         private Random random = new Random();
 
         public ReachANumber()
         {
-            TargetValue = random.Next(10, 51);
             for (int i = 0; i < RoundLimit; i++)
             {
                 if (i == 0)
                     Operators.Add(Operator.add);
                 else
-                    Operators.Add((Operator)random.Next(0, 2)); // Vi tager vores operator og tilfældiggøre den mellem 0-3
+                {
+                    if (Operators.Where(s => s == Operator.add).Count() >= 4)
+                    {
+                        Operators.Add(Operator.subtract);
+                    }
+                    else
+                        Operators.Add((Operator)random.Next(0, 2)); // Vi tager vores operator og tilfældiggøre den mellem 0-3
+                }
+            }
+
+            for (int i = 0; i < Operators.Count; i++)
+            {
+                List<int> numbers = new();
+                AllNumbers.Add(MakeRandomNumbers(i));
+            }
+
+            for (int i = 0; i < AllNumbers.Count; i++)
+            {
+                int tempTargetValue = TargetValue + CalculateCurrentValue(AllNumbers[i][random.Next(0, 3)], i);
+                while (tempTargetValue > 50 || tempTargetValue < 1)
+                    tempTargetValue = TargetValue + CalculateCurrentValue(AllNumbers[i][random.Next(0, 3)], i);
+                TargetValue = tempTargetValue;
             }
         }
 
-        public int CalculateCurrentValue(int selectedNumber)
+        private List<int> MakeRandomNumbers(int index)
+        {
+            List<int> numbers = new();
+
+            while (numbers.Distinct().Count() < 3)
+            {
+                int temp = random.Next(1, 21);
+                int tempNewValue = CalculateCurrentValue(temp, index);
+                if ((tempNewValue > 1 || tempNewValue < 60) && !numbers.Contains(temp))
+                {
+                    numbers.Add(temp);
+                }
+            }
+            return numbers;
+        }
+
+        public int CalculateCurrentValue(int selectedNumber, int index)
         {
             int newValue = CurrentValue;
-            switch (Operators[Round])
+            switch (Operators[index])
             {
                 case Operator.add:
                     newValue += selectedNumber;
@@ -127,18 +158,7 @@ namespace OnceUpenAGame
                     break;
                 }
 
-                List<int> numbers = new();
-                for (int i = 0; i < 3; i++)
-                {
-                    int temp = random.Next(1, 31);
-                    int tempNewValue = CalculateCurrentValue(temp);
-                    while ((tempNewValue < 1 || tempNewValue > 100) && numbers.Contains(temp))
-                    {
-                        temp = random.Next(1, 31);
-                    }
-
-                    numbers.Add(temp);
-                }
+                List<int> numbers = AllNumbers[Round];
 
                 int index = 0;
                 WriteOptions(numbers, index);
@@ -170,7 +190,7 @@ namespace OnceUpenAGame
                     // Handle different action for the option
                     if (keyinfo.Key == ConsoleKey.Enter)
                     {
-                        CurrentValue = CalculateCurrentValue(numbers[index]);
+                        CurrentValue = CalculateCurrentValue(numbers[index], Round);
 
                         if (CurrentValue > 100)
                         {
@@ -201,6 +221,8 @@ namespace OnceUpenAGame
                 Console.ForegroundColor = ConsoleColor.White;
             }
 
+            Thread.Sleep(5000);
+            return;
         }
     }
 }
