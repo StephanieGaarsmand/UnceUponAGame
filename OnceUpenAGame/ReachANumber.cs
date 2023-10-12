@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Figgle;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace OnceUpenAGame
 {
@@ -17,75 +20,173 @@ namespace OnceUpenAGame
 
         public ReachANumber()
         {
-            TargetValue = random.Next(51);
+            TargetValue = random.Next(10, 51);
             for (int i = 0; i < RoundLimit; i++)
             {
-                Operators.Add((Operator)random.Next(0, 4)); // Vi tager vores operator og tilfældiggøre den mellem 0-3
+                if(i == 0)
+                    Operators.Add(Operator.add);
+                else
+                    Operators.Add((Operator)random.Next(0, 2)); // Vi tager vores operator og tilfældiggøre den mellem 0-3
             }
         }
 
-        public void CalculateCurrentValue(int selectedNumber)
+        public int CalculateCurrentValue(int selectedNumber)
         {
+            int newValue = CurrentValue;
             switch (Operators[Round])
             {
                 case Operator.add:
-                    CurrentValue += selectedNumber;
+                    newValue += selectedNumber;
                     break;
 
                 case Operator.subtract:
-                    CurrentValue -= selectedNumber;
+                    newValue -= selectedNumber;
                     break;
 
-                case Operator.multiply:
-                    CurrentValue *= selectedNumber;
-                    break;
+                //case Operator.multiply:
+                //    newValue *= selectedNumber;
+                //    break;
 
-                case Operator.divide:
-                    CurrentValue = (int)Math.Round((double)CurrentValue / selectedNumber);
-                    break;
+                //case Operator.divide:
+                //    newValue = (int)Math.Round((double)newValue / selectedNumber);
+                //    if (newValue == 0)
+                //        newValue = 1;
+                //    break;
 
             }
-            Round++;
-
+            return newValue;
             // Udregn nuævrende værdi udfra det valgte nummer og tilfældig operator
             // Tjek om nummeret er ramt samt om runder er brugt
+        }
+
+        private void WriteOptions(List<int> numbers, int index)
+        {
+            Console.Clear();
+            for (int i = 0; i < Operators.Count; i++)
+            {
+                if (i == Operators.Count - 1)
+                {
+                    Console.Write($"{Operators[i]}\n\n");
+                }
+                else
+                    Console.Write($"{Operators[i]}, ");
+            }
+            Console.ForegroundColor = ConsoleColor.Yellow; Console.WriteLine($"The number you're trying to reach is: {TargetValue}");
+            Console.WriteLine($"The number you have: {CurrentValue} \n");
+            Console.ForegroundColor = ConsoleColor.White;
+
+            Console.WriteLine("You can choose between the following numbers:");
+
+            foreach (int number in numbers)
+            {
+                if (numbers.IndexOf(number) == index)
+                {
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write("<... ");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else
+                {
+                    Console.Write("     ");
+                }
+
+                Console.Write(number);
+
+                if (numbers.IndexOf(number) == index)
+                {
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine(" ...>");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else
+                {
+                    Console.WriteLine("     ");
+                }
+            }
         }
 
         public void SelectNumber()
         {
             while (Round + 1 <= RoundLimit)
             {
-                Console.Clear();
-                for (int i = 0; i < Operators.Count; i++)
+                if (CurrentValue == TargetValue)
                 {
-                    if (i == Operators.Count - 1)
-                    {
-                        Console.Write($"{Operators[i]}\n\n");
-                    }
-                    else
-                        Console.Write($"{Operators[i]}, ");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(FiggleFonts.Epic.Render("You've  Won!"));
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break;
                 }
+                
                 List<int> numbers = new();
                 for (int i = 0; i < 3; i++)
                 {
-                    numbers.Add(random.Next(0, 51));
+                    int temp = random.Next(1, 31);
+                    int tempNewValue = CalculateCurrentValue(temp);
+                    while ((tempNewValue < 1 || tempNewValue > 100) && numbers.Contains(temp))
+                    {
+                        temp = random.Next(1, 31);
+                    }
+
+                    numbers.Add(temp);
                 }
 
-                Console.WriteLine($"The number you're trying to reach is: {TargetValue}");
-                Console.WriteLine($"The number you have: {CurrentValue} \n");
+                int index = 0;
+                WriteOptions(numbers, index);
 
-                Console.WriteLine("You can choose between the following numbers:");
-                Console.WriteLine($"1) {numbers[0]}");
-                Console.WriteLine($"2) {numbers[1]}");
-                Console.WriteLine($"3) {numbers[2]}\n");
+                // Store key info in here
+                ConsoleKeyInfo keyinfo;
+                do
+                {
+                    keyinfo = Console.ReadKey();
 
-                Console.Write("You choose: ");
-                _ = int.TryParse(Console.ReadLine(), out int chosen);
+                    // Handle each key input (down arrow will write the menu again with a different selected item)
+                    if (keyinfo.Key == ConsoleKey.DownArrow)
+                    {
+                        if (index + 1 < numbers.Count)
+                        {
+                            index++;
+                            WriteOptions(numbers, index);
+                        }
+                    }
+                    if (keyinfo.Key == ConsoleKey.UpArrow)
+                    {
+                        if (index - 1 >= 0)
+                        {
+                            index--;
+                            WriteOptions(numbers, index);
+                        }
+                    }
 
-                CalculateCurrentValue(numbers[chosen -1]);
+                    // Handle different action for the option
+                    if (keyinfo.Key == ConsoleKey.Enter)
+                    {
+                        CurrentValue = CalculateCurrentValue(numbers[index]);
+
+                        if (CurrentValue > 100)
+                        {
+                            Console.WriteLine("Adventurer you've exceeded the max number so i shall put you on 100");
+                            CurrentValue = 100;
+                            Thread.Sleep(3000);
+                        }
+
+                        if (CurrentValue < 1)
+                        {
+                            Console.WriteLine("Adventurer you subceeded the minimum number so i shall put you on 1");
+                            CurrentValue = 1;
+                            Thread.Sleep(3000);
+                        }
+
+                        index = 0;
+                    }
+                }
+                while (keyinfo.Key != ConsoleKey.Enter);
+                //Console.ReadKey();
+
+                Round++;
             }
-            // Vis muligheder til brugeren. Modtag input fra bruger.
-            // Vi kører metoden med det valgte input
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(FiggleFonts.Epic.Render("You've  lost!"));
+            Console.ForegroundColor = ConsoleColor.White;
         }
     }
 }

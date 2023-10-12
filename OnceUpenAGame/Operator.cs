@@ -10,7 +10,7 @@ namespace OnceUpenAGame
     {
         add,
         subtract,
-        multiply,
-        divide
+        //multiply,
+        //divide
     }
 }

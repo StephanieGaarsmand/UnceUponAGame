@@ -89,6 +89,7 @@ namespace OnceUpenAGame
         void WriteOptions(Option selectedOption)
         {
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine(FiggleFonts.Epic.Render(Name));
 
             Console.ForegroundColor = ConsoleColor.Yellow;
