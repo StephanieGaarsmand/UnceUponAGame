@@ -36,6 +36,11 @@ namespace OnceUpenAGame
                     //new("Go back to sleep", () => Program.Main()),
                     new ("Go eat pancakes", () => Environment.Exit(0)) },
             new List<Item>() { });
+        public static Scene GetKey = new("Get Key", "Wizard", wizard, 
+                new List<Scene>() { },
+                new List<Option>(),
+                new List<Item>() { }
+            );
         #endregion
         #region Wizard
         private static string wizard = @"
@@ -72,7 +77,7 @@ namespace OnceUpenAGame
                 new List<Option>() { new("Start game", () => Program.StartGame()) },
             new List<Item>() { });
 
-        public static Scene MeetTheWizard = new("", "Wizard",
+        public static Scene MeetTheWizard = new("Meet the old man", "Wizard",
                 Program.wizard,
                 new List<Scene>() { Program.reachANumberGame },
                 new List<Option>(),
@@ -89,7 +94,7 @@ namespace OnceUpenAGame
 
             Item goldCoin = new("Gold Coin", "A coin with seemingly no use");
             Item flashlight = new("Flashlight", "A flashlight! Maybe it can be used to illuminate a dark room");
-
+            Item key = new("Old key", "This key unlocks the room with your parents");
 
 
             #region Great Hall
@@ -106,6 +111,15 @@ namespace OnceUpenAGame
             #endregion
 
             #region Church
+            Scene church4 = new("", "Church",
+                "You've gotten the key to rescue your parents!",
+                new List<Scene>() { },
+                new List<Option>() { },
+                new List<Item>() { },
+                type: SceneType.SubScene);
+            church4.Options = new List<Option> { new(
+                "Open Inventory", () => Player.OpenInventory(church4) ) };
+
             Scene church3 = new("", "Church",
                 "Finding no other items worth investigating you try to find any place where \"The Greatest Wizard of All\"\ncould've hidden your parents.\n" +
                 "You see a doorway hidden sligthly to the left of the alter",
@@ -132,7 +146,6 @@ namespace OnceUpenAGame
                     new("Examine the shiny thing", ()=> church2.DisplayScene()),
                     new("Open Inventory", () => Player.OpenInventory(church)) };
             #endregion
-
 
             #region Locker room
             Scene lockerroom3 = new("", "Locker room",
@@ -164,8 +177,8 @@ namespace OnceUpenAGame
                 new("Open Inventory", () => Player.OpenInventory(lockerroom)) };
             #endregion
 
-            Scene darkRoom = new("Enter dark room", "Dark Room", "Using the flashlight you see an old looking man standing near a blackboard.\n" +
-                "He must be the wizard..", new List<Scene>() { church3, Program.MeetTheWizard }, new List<Option>(), new List<Item>(), LockType.TooDark);
+            Scene darkRoom = new("Enter dark room", "Dark Room", "Using the flashlight you see an old looking man standing near a blackboard.\n",
+                new List<Scene>() { church3, Program.MeetTheWizard }, new List<Option>(), new List<Item>(), LockType.TooDark);
 
 
             Scene cave = new("Go inside cave", "Cave",
@@ -199,6 +212,7 @@ namespace OnceUpenAGame
                     new("Leave the coin", ()=> church3.DisplayScene()),
                     new("Open Inventory", () => Player.OpenInventory(church2))
             };
+            church4.NearestScenes = new() { cave };
             church3.NearestScenes = new() { darkRoom, cave };
             lockerroom.NearestScenes = new() { cave };
             lockerroom2.NearestScenes = new() { cave };
@@ -214,6 +228,9 @@ namespace OnceUpenAGame
                 "I wish you luck";
             Program.MeetTheWizard.Options = new() { new("Open Inventory", () => Player.OpenInventory(MeetTheWizard)) };
 
+            Program.GetKey.CharacterDialog = "Adventurer,\nYou are smarter than i anticipated, you have defeated my challenge\nCongratulations, here's the key, now find the room with your parents.";
+            Program.GetKey.Options = new() { new("Take Key", () => Program.PickUpItem(key, GetKey, greatHall, church4, darkRoom)) };
+            Program.GetKey.Items = new() { key };
             prolgue.DisplayScene();
 
             Console.ReadLine();
