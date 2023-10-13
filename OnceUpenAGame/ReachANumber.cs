@@ -39,11 +39,30 @@ namespace OnceUpenAGame
 
             for (int i = 0; i < AllNumbers.Count; i++)
             {
-                int tempTargetValue = TargetValue + CalculateCurrentValue(AllNumbers[i][random.Next(0, 3)], i);
-                while (tempTargetValue > 50 || tempTargetValue < 1)
-                    tempTargetValue = TargetValue + CalculateCurrentValue(AllNumbers[i][random.Next(0, 3)], i);
-                TargetValue = tempTargetValue;
+                for (int j = 0; j < 3; j++)
+                {
+                    bool foundNumber = false;
+                    int tempTargetValue = TargetValue + CalculateCurrentValue(AllNumbers[i][j], i);
+                    if (tempTargetValue <= 50 && tempTargetValue >= 2)
+                    {
+                        TargetValue = tempTargetValue;
+                        foundNumber = true;
+                        break;
+                    }
+                    if (!foundNumber && j==2)
+                    {
+                        AllNumbers[i]=MakeRandomNumbers(i);
+                        j = -1;
+                    }
+                }
+                //while (tempTargetValue > 50 || tempTargetValue < 1)
+                //{
+                //    tempTargetValue = TargetValue + CalculateCurrentValue(AllNumbers[i][random.Next(0, 3)], i);
+
+                //}
+                //TargetValue = tempTargetValue;
             }
+
         }
 
         private List<int> MakeRandomNumbers(int index)
