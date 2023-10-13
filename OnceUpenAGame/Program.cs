@@ -21,7 +21,7 @@ namespace OnceUpenAGame
             "You consider going back to sleep... but do you dare?",
             new List<Scene>() { },
             new List<Option>() {
-                    //new("Go back to sleep", () => Program.Main()),
+                    new("Go back to sleep", () => Program.InitGame()),
                     new ("Stay awake till morning", () => Environment.Exit(0)) },
             new List<Item>() { });
 
@@ -33,15 +33,11 @@ namespace OnceUpenAGame
            "You try to deside between going back to sleep or going to eat breakfast..",
            new List<Scene>() { },
            new List<Option>() {
-                    //new("Go back to sleep", () => Program.Main()),
+                    new("Go back to sleep", () => Program.InitGame()),
                     new ("Go eat pancakes", () => Environment.Exit(0)) },
             new List<Item>() { });
-        public static Scene GetKey = new("Get Key", "Wizard", wizard, 
-                new List<Scene>() { },
-                new List<Option>(),
-                new List<Item>() { }
-            );
         #endregion
+
         #region Wizard
         private static string wizard = @"
                     ____ 
@@ -67,21 +63,14 @@ namespace OnceUpenAGame
  _.-'       |      BBb       '-.  '-. 
 (________mrf\____.dBBBb.________)____)";
 
-        private static Scene reachANumberGame = new("Reach a number", "Rules - Reach  a  number",
-                "The Great Wizard has captured your parents and the only way to free them is by completing his DIE HARD CHALLENGE.\n" +
-                "This challenge needs to be completed within 7 tries, BUT not all tries needs to be used, for the freedom of your parents.\n" +
-                "To win the game you have to add, subtract and use the witts of Mathematics, The Great Wizards only accepts intellectual beings, no mere human can complete this.\n\n" +
-                "Now you have to chose from a list of numbers, filled with new numbers each round, to use with the given operators.\n" +
-                "The operators is already planed for you. - read the game design CAREFULLY",
+        public static Scene GetKey = new("Get Key", "Wizard", wizard,
                 new List<Scene>() { },
-                new List<Option>() { new("Start game", () => Program.StartGame()) },
-            new List<Item>() { });
-
-        public static Scene MeetTheWizard = new("Meet the old man", "Wizard",
-                Program.wizard,
-                new List<Scene>() { Program.reachANumberGame },
                 new List<Option>(),
                 new List<Item>() { });
+
+        private static Scene reachANumberGame;
+
+        public static Scene MeetTheWizard;
 
         #endregion
 
@@ -92,22 +81,43 @@ namespace OnceUpenAGame
             ShowWindow(ThisConsole, 3);
             #endregion
 
+            
+            InitGame();
+        }
+
+        public static void InitGame()
+        {
             Item goldCoin = new("Gold Coin", "A coin with seemingly no use");
             Item flashlight = new("Flashlight", "A flashlight! Maybe it can be used to illuminate a dark room");
             Item key = new("Old key", "This key unlocks the room with your parents");
 
+            #region Game Scene
+            Program.reachANumberGame = new("Reach a number", "Rules - Reach  a  number",
+                "The Great Wizard has captured your parents and the only way to free them is by completing his DIE HARD CHALLENGE.\n" +
+                "This challenge needs to be completed within 7 tries, BUT not all tries needs to be used, for the freedom of your parents.\n" +
+                "To win the game you have to add, subtract and use the witts of Mathematics, The Great Wizards only accepts intellectual beings, no mere human can complete this.\n\n" +
+                "Now you have to chose from a list of numbers, filled with new numbers each round, to use with the given operators.\n" +
+                "The operators is already planned for you. - read the game design CAREFULLY",
+                new List<Scene>() { },
+                new List<Option>() { new("Start game", () => Program.StartGame()) },
+            new List<Item>() { });
+            #endregion
+
+            Program.MeetTheWizard = new("Meet the old man", "Wizard",
+                Program.wizard,
+                new List<Scene>() { Program.reachANumberGame },
+                new List<Option>(),
+                new List<Item>() { });
+
 
             #region Great Hall
             Scene greatHall = new("Go to door in front of you", "The Hall Of Greatness",
-                "Description here",
+                "You find your parents standing in the middle of the room",
                 new List<Scene>() { },
                 new List<Option>() { },
                 new List<Item>() { },
                 isLocked: LockType.Locked);
-            greatHall.Options = new List<Option> { new(
-                "Open Inventory",
-                () => Player.OpenInventory(greatHall)
-                ) };
+            greatHall.Options = new List<Option> { new("Leave with your parents", () => Program.BedroomGood.DisplayScene())};
             #endregion
 
             #region Church
@@ -180,7 +190,6 @@ namespace OnceUpenAGame
             Scene darkRoom = new("Enter dark room", "Dark Room", "Using the flashlight you see an old looking man standing near a blackboard.\n",
                 new List<Scene>() { church3, Program.MeetTheWizard }, new List<Option>(), new List<Item>(), LockType.TooDark);
 
-
             Scene cave = new("Go inside cave", "Cave",
                 "Inside the cave you see more of the spiders crawling under a big door in front of you.\nLooking around you see two others open doorways to each side of you.",
                 new List<Scene>() { church, lockerroom, greatHall },
@@ -232,8 +241,6 @@ namespace OnceUpenAGame
             Program.GetKey.Options = new() { new("Take Key", () => Program.PickUpItem(key, GetKey, greatHall, church4, darkRoom)) };
             Program.GetKey.Items = new() { key };
             prolgue.DisplayScene();
-
-            Console.ReadLine();
         }
 
         public static void StartGame()
@@ -248,7 +255,9 @@ namespace OnceUpenAGame
             scene.Items.Remove(item);
             if (sceneWhichUsesItem != null)
                 sceneWhichUsesItem.Lock = LockType.Unlocked;
-            parentScene = nextScene;
+            parentScene.Description = nextScene.Description;
+            parentScene.NearestScenes = nextScene.NearestScenes;
+            parentScene.Options = nextScene.Options;
             nextScene.DisplayScene();
         }
     }

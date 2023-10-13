@@ -22,7 +22,7 @@ namespace OnceUpenAGame
             string s = "";
             foreach (Item item in Inventory)
             {
-                s += $"{item.Name}\n";
+                s += $"{item.Name} - {item.Description}\n";
             }
             return s;
         }

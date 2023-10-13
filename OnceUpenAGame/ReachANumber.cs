@@ -159,7 +159,7 @@ namespace OnceUpenAGame
                     Console.ForegroundColor = ConsoleColor.White;
                     Thread.Sleep(1000);
                     Console.ReadKey();
-                    Program.BedroomBad.DisplayScene();
+                    Program.GetKey.DisplayScene();
                 }
 
                 List<int> numbers = AllNumbers[Round];
